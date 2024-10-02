@@ -13,6 +13,9 @@ if(!is.null(dev.list())) dev.off() # Clear plots in case these are present
 rm(list=ls()) # Remove all variables that are in the current workspace
 ```
 
+##Data preparation
+
+First, the data was imported and sampled as asked to. 
 
 ```{r}
 library(readr)
@@ -23,15 +26,18 @@ View(train)
 ```{r}
 head(train)
 ```
+We need some information about the data to start making decisions about how deal with the problem.
+
 
 ```{r}
 summary(train)
 ```
+In the summary, it can be notice that in the variable "pctsomecol18_24" shows a great percentage of missing values. According with the information of the project, the variable corresponds with "Percent of county residents ages 18-24 highest education attained: some college" so it should be decided what to do with the variable.
 
 ```{r}
 str(train)
 ```
-
+This checks the type of each variable 
 ```{r}
 # Some plots are done:
 boxplot(train$percentmarried)
@@ -53,7 +59,7 @@ abline(v = usout, col = "red", lwd = 2)
 ```
 
 ```{r}
-plot(train[,14], train[,32])
+plot(train[,c(14,32)])
 ```
 
 ```{r}
