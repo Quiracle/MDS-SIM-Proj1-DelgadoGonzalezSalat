@@ -2,6 +2,4 @@
 
 ## TODO:
 
-- Test different methods for NA compleetion. If NA% > 50, remove variable
-
-- 
+- [ ] Test different methods for NA completion. If NA% > 50, remove variable 
