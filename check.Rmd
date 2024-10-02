@@ -1,0 +1,56 @@
+---
+title: "Test"
+output: html_document
+date: "2024-09-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+if(!is.null(dev.list())) dev.off() # Clear plots in case these are present
+rm(list=ls()) # Remove all variables that are in the current workspace
+```
+
+
+```{r}
+library(readr)
+train <- read_csv("train.csv")
+View(train)
+```
+
+```{r}
+head(train)
+```
+
+
+
+```{r}
+summary(train)
+```
+
+```{r}
+str(train)
+```
+
+```{r}
+# Some plots are done:
+boxplot(train$percentmarried)
+boxplot(train$pctmarriedhouseholds)
+```
+
+
+```{r}
+varout <- summary(train$pctmarriedhouseholds)
+
+# Interquartile range calculation:
+iqr <- varout[5] - varout[2]
+
+umout <- varout[5] + 1.5*iqr # Upper extreme for mild outliers
+usout <- varout[5] + 3*iqr # Upper extreme for extreme outliersm (iqr = inter quartile range)
+boxplot(train$percentmarried, horizontal = TRUE)
+boxplot(train$pctmarriedhouseholds, horizontal = TRUE)
+abline(v = umout, col = "orange", lwd = 2)
+abline(v = usout, col = "red", lwd = 2)
+```
