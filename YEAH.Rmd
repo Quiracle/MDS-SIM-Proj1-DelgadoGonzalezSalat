@@ -1,0 +1,412 @@
+---
+title: "Assignment1"
+author: "Nashly Gonzalez"
+date: "2024-10-06"
+output: pdf_document
+---
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, results = 'asis', warning = FALSE, message = FALSE)
+
+file.exists("train.csv")
+df <- read.csv("train.csv")
+View(df)
+```
+
+# Data preparation
+
+Firstly, the data was imported. The result is saved as “ASIG1DGS_sample_raw.Rdata” and imported.
+
+### Variables Analysis
+
+For each variable in this dataset, a descriptive analysis is conducted, a data quality assessment is generated, and imputation and profiling are documented.
+
+### Variable 1: avganncount
+
+This is a continuous ratio variable. The data does not look normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. A histogram is used to visualize the data. The variable contains no missing values thus imputation is not needed. It contains 273 outliers (out of which 252 severe), all on the high side of the spectrum. We create an additional ordinal mpg factor “f.mpg” to create a discretisation according to the quartiles.
+
+```{r}
+summary(df$avganncount)
+
+hist(df$avganncount, breaks = 30, freq = F)
+curve(dnorm(x, mean(df$avganncount), sd(df$avganncount)), add = T)
+
+shapiro.test(df$avganncount)
+
+sum(is.na(df$avganncount))
+
+boxplot(df$avganncount)
+bp<-boxplot(df$avganncount, id = list(n=Inf))
+length(bp$out)
+
+sevout_avganncount = (quantile(df$avganncount,0.25)+(3*((quantile(df$avganncount,0.75) - quantile(df$avganncount, 0.25)))))
+length(which(df$avganncount > sevout_avganncount))
+
+df$f.avganncount <- ifelse(df$avganncount <= 80, 1, 
+                           ifelse(df$avganncount > 80 & df$avganncount <= 175, 2, 
+                           ifelse(df$avganncount > 175 & df$avganncount <= 509, 3, 
+                           ifelse(df$avganncount > 509, 4,0)))) 
+df$f.avganncount <- factor(df$f.avganncount, 
+                           labels=c("LowAvganncount","LowMidAvganncount","HighMidAvganncount","HighAvganncount"), 
+                           order = T, 
+                           levels=c(1,2,3,4))
+table(df$f.avganncount)
+```
+
+
+### Variable 2: avgdeathsperyear
+
+This is a continuous ratio variable. The data does not look normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. A histogram is used to visualize the data. The variable contains no missing values thus imputation is not needed. It contains 225 outliers (out of which 178 severe), all on the high side of the spectrum. We create an additional ordinal mpg factor “f.mpg” to create a discretisation according to the quartiles.
+
+```{r}
+summary(df$avgdeathsperyear)
+
+hist(df$avgdeathsperyear, breaks = 30, freq = F)
+curve(dnorm(x, mean(df$avgdeathsperyear), sd(df$avgdeathsperyear)), add = T, col = "red")
+
+shapiro.test(df$avgdeathsperyear)
+
+sum(is.na(df$avgdeathsperyear))
+
+boxplot(df$avgdeathsperyear)
+
+bp<-boxplot(df$avgdeathsperyear, id = list(n=Inf))
+length(bp$out)
+
+sevout_avgdeathsperyear = (quantile(df$avgdeathsperyear,0.25)+(3*((quantile(df$avgdeathsperyear,0.75) - quantile(df$avgdeathsperyear, 0.25)))))
+length(which(df$avgdeathsperyear > sevout_avgdeathsperyear))
+
+df$f.avgdeathsperyear <- ifelse(df$avgdeathsperyear <= 29, 1, 
+                                ifelse(df$avgdeathsperyear > 29 & df$avgdeathsperyear <= 62, 2, 
+                                       ifelse(df$avgdeathsperyear > 62 & df$avgdeathsperyear <= 140.5, 3, 
+                                              ifelse(df$avgdeathsperyear > 104.5, 4,0)))) 
+df$f.avgdeathsperyear <- factor(df$f.avgdeathsperyear, 
+                                labels=c("LowAvgdeathsperyear","LowMidAvgdeathsperyear","HighMidAvgdeathsperyear","HighAvgdeathsperyear"), 
+                                order = T, 
+                                levels=c(1,2,3,4))
+table(df$f.avgdeathsperyear)
+```
+
+
+### Variable 3: target_deathrate
+
+This is a continuous ratio variable. The data does not look normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. Again a histogram is used to visualize the data. The variable contains no missing values thus imputation is not needed. It contains 35 outliers (out of which 11 severe), all on both sides of the spectrum. We create an additional ordinal mpg factor “f.mpg” to create a discretisation according to the quartiles.
+
+```{r}
+summary(df$target_deathrate)
+
+hist(df$target_deathrate, breaks = 30, freq = F)
+curve(dnorm(x, mean(df$target_deathrate), sd(df$target_deathrate)), add = T, col = "red")
+
+shapiro.test(df$target_deathrate)
+
+sum(is.na(df$target_deathrate))
+
+boxplot(df$target_deathrate)
+
+bp<-boxplot(df$target_deathrate, id = list(n=Inf))
+length(bp$out)
+
+sevout_target_deathrate = (quantile(df$target_deathrate,0.25)+(3*((quantile(df$target_deathrate,0.75) - quantile(df$target_deathrate, 0.25)))))
+length(which(df$target_deathrate > sevout_target_deathrate))
+
+df$f.target_deathrate <- ifelse(df$target_deathrate <= 161.3, 1, 
+                           ifelse(df$target_deathrate > 161.3 & df$target_deathrate <= 178.3, 2, 
+                                  ifelse(df$target_deathrate > 178.3 & df$target_deathrate <= 195.3, 3, 
+                                         ifelse(df$target_deathrate > 195.3, 4,0))))
+
+df$f.target_deathrate <- factor(df$f.target_deathrate, labels=c("LowTarget_deathrate","LowMidTarget_deathrate","HighMidTarget_deathrate","HighTarget_deathrate"), 
+                           order = T, 
+                           levels=c(1,2,3,4))
+table(df$f.target_deathrate)
+```
+
+### Variable 4: incidencerate
+
+This is a continuous ratio variable. The data does not look normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. Again a histogram is used to visualize the data. The variable contains no missing values thus imputation is not needed. It contains 60 outliers (out of which 3 severe), all on both sides of the spectrum. We create an additional ordinal mpg factor “f.mpg” to create a discretisation according to the quartiles.
+
+```{r}
+summary(df$incidencerate)
+
+hist(df$incidencerate, breaks = 30, freq = F)
+curve(dnorm(x, mean(df$incidencerate), sd(df$incidencerate)), add = T, col = "red")
+
+shapiro.test(df$incidencerate)
+
+sum(is.na(df$incidencerate))
+
+boxplot(df$incidencerate)
+
+bp<-boxplot(df$incidencerate, id = list(n=Inf))
+length(bp$out)
+
+sevout_incidencerate = (quantile(df$incidencerate,0.25)+(3*((quantile(df$incidencerate,0.75) - quantile(df$incidencerate, 0.25)))))
+length(which(df$incidencerate > sevout_incidencerate))
+
+df$f.incidencerate <- ifelse(df$incidencerate <= 421.4000, 1, 
+                           ifelse(df$incidencerate > 421.4000 & df$incidencerate <= 453.5494, 2, 
+                                  ifelse(df$incidencerate > 453.5494 & df$incidencerate <= 481.3000, 3, 
+                                         ifelse(df$incidencerate > 481.3000, 4,0)))) 
+df$f.incidencerate <- factor(df$f.incidencerate, 
+                           labels=c("LowIncidencerate","LowMidIncidencerate","HighMidIncidencerate","HighIncidencerate"), 
+                           order = T, 
+                           levels=c(1,2,3,4))
+table(df$f.incidencerate)
+
+```
+
+
+### Variable 5: medincome
+
+This is a continuous ratio variable. The data does not look normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. A histogram is used to visualize the data. The variable contains no missing values thus imputation is not needed. It contains 69 outliers (out of which 44 severe), all on the high side of the spectrum. We create an additional ordinal mpg factor “f.mpg” to create a discretisation according to the quartiles.
+
+```{r}
+summary(df$medincome)
+
+hist(df$medincome, breaks = 30, freq = F)
+curve(dnorm(x, mean(df$medincome), sd(df$medincome)), add = T, col = "red")
+
+shapiro.test(df$medincome)
+
+sum(is.na(df$medincome))
+
+boxplot(df$medincome)
+
+bp<-boxplot(df$medincome, id = list(n=Inf))
+length(bp$out)
+
+sevout_medincome = (quantile(df$medincome,0.25)+(3*((quantile(df$medincome,0.75) - quantile(df$medincome, 0.25)))))
+length(which(df$medincome > sevout_medincome))
+
+df$f.medincome <- ifelse(df$medincome <= 39031, 1, 
+                           ifelse(df$medincome > 39031 & df$medincome <= 45454, 2, 
+                                  ifelse(df$medincome > 45454 & df$medincome <= 52612, 3, 
+                                         ifelse(df$medincome > 52612, 4,0)))) 
+df$f.medincome <- factor(df$f.medincome, 
+                           labels=c("LowMedincome","LowMidMedincome","HighMidMedincome","HighMedincome"), 
+                           order = T, 
+                           levels=c(1,2,3,4))
+table(df$f.medincome)
+```
+
+
+### Variable 6: popest2015
+
+This is a continuous ratio variable. The data does not look normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. A histogram is used to visualize the data. The variable contains no missing values thus imputation is not needed. It contains 252 outliers (out of which 210 severe), all on the high side of the spectrum. We create an additional ordinal mpg factor “f.mpg” to create a discretisation according to the quartiles.
+
+```{r}
+summary(df$popest2015)
+
+hist(df$popest2015, breaks = 30, freq = F)
+curve(dnorm(x, mean(df$popest2015), sd(df$popest2015)), add = T, col = "red")
+
+shapiro.test(df$popest2015)
+
+sum(is.na(df$popest2015))
+
+boxplot(df$popest2015)
+
+bp<-boxplot(df$popest2015, id = list(n=Inf))
+length(bp$out)
+
+sevout_popest2015 = (quantile(df$popest2015,0.25)+(3*((quantile(df$popest2015,0.75) - quantile(df$popest2015, 0.25)))))
+length(which(df$popest2015 > sevout_popest2015))
+
+df$f.popest2015 <- ifelse(df$popest2015 <= 12191.0, 1, 
+                           ifelse(df$popest2015 > 12191.0 & df$popest2015 <= 27158.0, 2, 
+                                  ifelse(df$popest2015 > 27158.0 & df$popest2015 <= 66879.5, 3, 
+                                         ifelse(df$popest2015 > 66879.5, 4,0)))) 
+df$f.popest2015 <- factor(df$f.popest2015, 
+                           labels=c("LowPopest2015","LowMidPopest2015","HighMidPopest2015","HighPopest2015"), 
+                           order = T, 
+                           levels=c(1,2,3,4))
+table(df$f.popest2015)
+
+```
+
+
+### Variable 7: povertypercent
+
+This is a continuous ratio variable. The data does not look normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. A histogram is used to visualize the data. The variable contains no missing values thus imputation is not needed. It contains 225 outliers (out of which 178 severe), all on the high side of the spectrum. We create an additional ordinal mpg factor “f.mpg” to create a discretisation according to the quartiles.
+
+```{r}
+summary(df$povertypercent)
+
+hist(df$povertypercent, breaks = 30, freq = F)
+curve(dnorm(x, mean(df$povertypercent), sd(df$povertypercent)), add = T, col = "red")
+
+shapiro.test(df$povertypercent)
+
+sum(is.na(df$povertypercent))
+
+boxplot(df$povertypercent)
+
+bp<-boxplot(df$povertypercent, id = list(n=Inf))
+length(bp$out)
+
+sevout_povertypercent = (quantile(df$povertypercent,0.25)+(3*((quantile(df$povertypercent,0.75) - quantile(df$povertypercent, 0.25)))))
+length(which(df$povertypercent > sevout_povertypercent))
+
+df$f.povertypercent <- ifelse(df$povertypercent <= 12.15, 1, 
+                           ifelse(df$povertypercent > 12.15 & df$povertypercent <= 15.70, 2, 
+                                  ifelse(df$povertypercent > 15.70 & df$povertypercent <= 20.40, 3, 
+                                         ifelse(df$povertypercent > 20.40, 4,0)))) 
+df$f.povertypercent <- factor(df$f.povertypercent, 
+                           labels=c("LowPovertypercent","LowMidPovertypercent","HighMidPovertypercent","HighPovertypercent"), 
+                           order = T, 
+                           levels=c(1,2,3,4))
+table(df$f.povertypercent)
+```
+
+### Variable 8: studypercap
+
+This is a continuous ratio variable. The data does not look normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. A histogram is used to visualize the data. The variable contains no missing values thus imputation is not needed. It contains 307 outliers (out of which 281 severe), all on the high side of the spectrum. We create an additional ordinal mpg factor “f.mpg” to create a discretisation according to the quartiles.
+
+```{r}
+summary(df$studypercap)
+
+hist(df$studypercap, breaks = 30, freq = F)
+curve(dnorm(x, mean(df$studypercap), sd(df$studypercap)), add = T, col = "red")
+
+shapiro.test(df$studypercap)
+
+sum(is.na(df$studypercap))
+
+boxplot(df$studypercap)
+
+bp<-boxplot(df$studypercap, id = list(n=Inf))
+length(bp$out)
+
+sevout_studypercap = (quantile(df$studypercap,0.25)+(3*((quantile(df$studypercap,0.75) - quantile(df$studypercap, 0.25)))))
+length(which(df$studypercap > sevout_studypercap))
+
+df$f.studypercap <- ifelse(df$studypercap <= 0.00000, 1, 
+                           ifelse(df$studypercap > 0.00000 & df$studypercap <= 0.00000, 2, 
+                                  ifelse(df$studypercap > 0.00000 & df$studypercap <= 76.00412, 3, 
+                                         ifelse(df$studypercap > 76.00412, 4,0)))) 
+df$f.studypercap <- factor(df$f.studypercap, 
+                           labels=c("LowStudypercap","LowMidStudypercap","HighMidStudypercap","HighStudypercap"), 
+                           order = T, 
+                           levels=c(1,2,3,4))
+table(df$f.studypercap)
+```
+
+
+
+### Variable 9: binnedinc --------------
+
+
+
+```{r}
+
+```
+
+
+### Variable 10: medianage 
+
+This is a continuous ratio variable. The data does not look normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. A histogram is used to visualize the data. The variable contains no missing values thus imputation is not needed. It contains 65 outliers (out of which 23 severe), all on both sides of the spectrum. We create an additional ordinal mpg factor “f.mpg” to create a discretisation according to the quartiles.
+
+```{r}
+summary(df$medianage)
+
+hist(df$medianage, breaks = 30, freq = F)
+curve(dnorm(x, mean(df$medianage), sd(df$medianage)), add = T, col = "red")
+
+shapiro.test(df$medianage)
+
+sum(is.na(df$medianage))
+
+boxplot(df$medianage)
+
+bp<-boxplot(df$medianage, id = list(n=Inf))
+length(bp$out)
+
+sevout_medianage = (quantile(df$medianage,0.25)+(3*((quantile(df$medianage,0.75) - quantile(df$medianage, 0.25)))))
+length(which(df$medianage > sevout_medianage))
+
+df$f.medianage <- ifelse(df$medianage <= 37.9, 1, 
+                           ifelse(df$medianage > 37.9 & df$medianage <= 40.9, 2, 
+                                  ifelse(df$medianage > 40.9 & df$medianage <= 44.0, 3, 
+                                         ifelse(df$medianage > 44.0, 4,0)))) 
+df$f.medianage <- factor(df$f.medianage, 
+                           labels=c("LowMedianage","LowMidMedianage","HighMidMedianage","HighMedianage"), 
+                           order = T, 
+                           levels=c(1,2,3,4))
+table(df$f.medianage)
+```
+
+
+
+### Variable 11: medianagemale
+
+This is a continuous ratio variable. The data does not look normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. A histogram is used to visualize the data. The variable contains no missing values thus imputation is not needed. It contains 46 outliers (out of which 6 severe), all on both sides of the spectrum.. We create an additional ordinal mpg factor “f.mpg” to create a discretisation according to the quartiles.
+
+```{r}
+summary(df$medianagemale)
+
+hist(df$medianagemale, breaks = 30, freq = F)
+curve(dnorm(x, mean(df$medianagemale), sd(df$medianagemale)), add = T, col = "red")
+
+shapiro.test(df$medianagemale)
+sum(is.na(df$medianagemale))
+
+boxplot(df$medianagemale)
+
+bp<-boxplot(df$medianagemale, id = list(n=Inf))
+length(bp$out)
+
+sevout_medianagemale = (quantile(df$medianagemale,0.25)+(3*((quantile(df$medianagemale,0.75) - quantile(df$medianagemale, 0.25)))))
+length(which(df$medianagemale > sevout_medianagemale))
+
+df$f.medianagemale <- ifelse(df$medianagemale <= 36.4, 1, 
+                           ifelse(df$medianagemale > 36.4 & df$medianagemale <= 39.5, 2, 
+                                  ifelse(df$medianagemale > 39.5 & df$medianagemale <= 42.6, 3, 
+                                         ifelse(df$medianagemale > 42.6, 4,0)))) 
+df$f.medianagemale <- factor(df$f.medianagemale, 
+                           labels=c("LowMedianagemale","LowMidMedianagemale","HighMidMedianagemale","HighMedianagemale"), 
+                           order = T, 
+                           levels=c(1,2,3,4))
+table(df$f.medianagemale)
+```
+
+
+### Variable 12: medianagefemale
+
+This is a continuous ratio variable. The data does not look normally distributed, which is confirmed by the near-null p-value of the shapiro normallity test. A histogram is used to visualize the data. The variable contains no missing values thus imputation is not needed. It contains 55 outliers (out of which 1 severe), all on both sides of the spectrum. We create an additional ordinal mpg factor “f.mpg” to create a discretisation according to the quartiles.
+
+
+```{r}
+summary(df$medianagefemale)
+
+hist(df$medianagefemale, breaks = 30, freq = F)
+curve(dnorm(x, mean(df$medianagefemale), sd(df$medianagefemale)), add = T , col = "red")
+
+shapiro.test(df$medianagefemale)
+sum(is.na(df$medianagefemale))
+
+boxplot(df$medianagefemale)
+
+bp<-boxplot(df$medianagefemale, id = list(n=Inf))
+length(bp$out)
+
+sevout_medianagefemale = (quantile(df$medianagefemale,0.25)+(3*((quantile(df$medianagefemale,0.75) - quantile(df$medianagefemale, 0.25)))))
+length(which(df$medianagefemale > sevout_medianagefemale))
+sevout_medianagefemale
+
+df$f.medianagefemale <- ifelse(df$medianagefemale <= 80, 1, 
+                           ifelse(df$medianagefemale > 80 & df$medianagefemale <= 175, 2, 
+                                  ifelse(df$medianagefemale > 175 & df$medianagefemale <= 509, 3, 
+                                         ifelse(df$medianagefemale > 509, 4,0)))) 
+df$f.medianagefemale <- factor(df$f.medianagefemale, 
+                           labels=c("LowMedianagefemale","LowMidMedianagefemale","HighMidMedianagefemale","HighMedianagefemale"), 
+                           order = T, 
+                           levels=c(1,2,3,4))
+table(df$f.medianagefemale)
+
+```
+
+
+### Variable 13: geography ---------------------
