@@ -6,4 +6,4 @@
 
 - [ ] Remove studies variables (irrelevant) and duplicated variables
 
-- [ ] Check csv correctness
+- [x] Check csv correctness

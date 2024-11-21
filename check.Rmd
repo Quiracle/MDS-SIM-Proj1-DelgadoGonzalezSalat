@@ -20,7 +20,6 @@ First, the data was imported and sampled as asked to.
 ```{r}
 library(readr)
 train <- read_csv("train.csv")
-View(train)
 ```
 
 ```{r}
@@ -31,6 +30,8 @@ We need some information about the data to start making decisions about how deal
 
 ```{r}
 summary(train)
+train$binnedinc <- factor(train$binnedinc)
+train$geography <- factor(train$geography)
 ```
 In the summary, it can be notice that in the variable "pctsomecol18_24" shows a great percentage of missing values. According with the information of the project, the variable corresponds with "Percent of county residents ages 18-24 highest education attained: some college" so it should be decided what to do with the variable.
 
@@ -64,5 +65,121 @@ plot(train[,c(14,32)])
 
 ```{r}
 cor(train[,1:8])
+```
+
+# Determine if the response variable (deathrate) has an acceptably normal distribution.
+
+It is not normally distributed
+```{r}
+hist(train$target_deathrate, breaks = 15, freq = FALSE, col="cyan")
+curve(dnorm(x, mean(train$target_deathrate), sd(train$target_deathrate)), add = TRUE)
+```
+
+```{r}
+shapiro.test(train$target_deathrate)
+```
+
+# Address tests to discard serial correlation.
+
+using acf we can see there is autocorrelation, so we randomize the dataframe to get rid of it.
+```{r}
+acf(train$target_deathrate)
+```
+
+```{r}
+ll <- sample(1:nrow(train),nrow(train))
+train <- train[ll,]
+acf(train$target_deathrate)
+```
+
+# Detect univariant and multivariant outliers and retain all of them in exploratory analysis.
+
+```{r}
+sum <- summary(train$avganncount)
+iqr <- sum[5] - sum[2]
+lmout <- sum[2] - 1.5*iqr
+umout <- sum[5] + 1.5*iqr
+lsout <- sum[2] - 3*iqr
+usout <- sum[5] + 3*iqr
+boxplot(train$avganncount, horizontal = TRUE)
+abline(v = umout, col = "orange", lwd = 2)
+abline(v = usout, col = "red", lwd = 2)
+abline(v = lmout, col = "orange", lwd = 2)
+abline(v = lsout, col = "red", lwd = 2)
+sevout <- which(train$avganncount > usout); sevout
+```
+
+```{r}
+sum <- summary(train$avgdeathsperyear)
+iqr <- sum[5] - sum[2]
+lmout <- sum[2] - 1.5*iqr
+umout <- sum[5] + 1.5*iqr
+lsout <- sum[2] - 3*iqr
+usout <- sum[5] + 3*iqr
+boxplot(train$avgdeathsperyear, horizontal = TRUE)
+abline(v = umout, col = "orange", lwd = 2)
+abline(v = usout, col = "red", lwd = 2)
+abline(v = lmout, col = "orange", lwd = 2)
+abline(v = lsout, col = "red", lwd = 2)
+sevout <- which(train$avgdeathsperyear > usout); sevout
+```
+
+```{r}
+sum <- summary(train$povertypercent)
+iqr <- sum[5] - sum[2]
+lmout <- sum[2] - 1.5*iqr
+umout <- sum[5] + 1.5*iqr
+lsout <- sum[2] - 3*iqr
+usout <- sum[5] + 3*iqr
+boxplot(train$povertypercent, horizontal = TRUE)
+abline(v = umout, col = "orange", lwd = 2)
+abline(v = usout, col = "red", lwd = 2)
+abline(v = lmout, col = "orange", lwd = 2)
+abline(v = lsout, col = "red", lwd = 2)
+sevout <- which(train$povertypercent > usout); sevout
+```
+
+```{r}
+sum <- summary(train$pctunemployed16_over)
+iqr <- sum[5] - sum[2]
+lmout <- sum[2] - 1.5*iqr
+umout <- sum[5] + 1.5*iqr
+lsout <- sum[2] - 3*iqr
+usout <- sum[5] + 3*iqr
+boxplot(train$pctunemployed16_over, horizontal = TRUE)
+abline(v = umout, col = "orange", lwd = 2)
+abline(v = usout, col = "red", lwd = 2)
+abline(v = lmout, col = "orange", lwd = 2)
+abline(v = lsout, col = "red", lwd = 2)
+sevout <- which(train$pctunemployed16_over > usout); sevout
+```
+
+```{r}
+library(chemometrics)
+res.mout <- Moutlier(train[,1:4], quantile = 0.995)
+```
+
+```{r}
+plot(res.mout$md, res.mout$rd, col= "cyan", pch = 19)
+abline(h=res.mout$cutoff, col = "red")
+abline(v=res.mout$cutoff, col = "red")
+text(res.mout$md, res.mout$rd, label = row.names(df), cex = 0.5)
+mult_outliers <- which((res.mout$md > res.mout$cutoff) & (res.mout$rd > res.mout$cutoff))
+print(mult_outliers)
+```
+
+# Errors and missing values (if any) detection. Apply an imputation technique for both train and test datasets, if needed.
+
+```{r}
+library(mice)
+summary(train)
+imputation = mice(train[,1:])
+summary(train$pctprivatecoveragealone)
+summary(train$pctsomecol18_24)
+summary(train$pctemployed16_over)
+
+summary(complete(imputation)$pctprivatecoveragealone)
+summary(complete(imputation)$pctsomecol18_24)
+summary(complete(imputation)$pctemployed16_over)
 ```
 
