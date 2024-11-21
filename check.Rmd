@@ -170,10 +170,29 @@ print(mult_outliers)
 
 # Errors and missing values (if any) detection. Apply an imputation technique for both train and test datasets, if needed.
 
+We remove pctsomecol18_24, since it has over 70% of NAs.
+Using impute PCA for the other two variables (pctemployed16_over and pctprivatecoveragealone) with missing values, we see that the summary of each variable doesn't change meaningfully
 ```{r}
+library(missMDA)
+res.misMDA <- imputePCA(train[,c(-17, -9, -13)])
+
+summary(train$pctprivatecoveragealone)
+summary(res.misMDA$completeObs[,"pctprivatecoveragealone"])
+
+summary(train$pctemployed16_over)
+summary(res.misMDA$completeObs[,"pctemployed16_over"])
+```
+```{r}
+train[,c(-17, -9, -13)] <- res.misMDA$completeObs
+train <- train[,-17]
+```
+
+
+```{r}
+'''
 library(mice)
 summary(train)
-imputation = mice(train[,1:])
+imputation = mice(train[,-17], method=)
 summary(train$pctprivatecoveragealone)
 summary(train$pctsomecol18_24)
 summary(train$pctemployed16_over)
@@ -181,5 +200,15 @@ summary(train$pctemployed16_over)
 summary(complete(imputation)$pctprivatecoveragealone)
 summary(complete(imputation)$pctsomecol18_24)
 summary(complete(imputation)$pctemployed16_over)
+'''
+```
+
+# Preliminary exploratory analysis to describe observed relations has to be undertaken
+
+```{r}
+library(FactoMineR)
+
+res.con <- condes(train[,1:12], 3)
+
 ```
 
