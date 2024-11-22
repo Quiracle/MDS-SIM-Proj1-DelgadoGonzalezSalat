@@ -205,10 +205,19 @@ summary(complete(imputation)$pctemployed16_over)
 
 # Preliminary exploratory analysis to describe observed relations has to be undertaken
 
+To do this, the condes function of the FactoMiner package is used, which for the
+numeric response variable ‘target_deathrate’ calculates the correlation of each of the quantitative
+variables and the coefficient of determination (R^2) for the qualitative variables,
+together with a p-value for significance.
+
+For the quantitative variables it is clear both pctpubliccoveragealone and povertypercent are highly significant positively correlated (r > 0.45, p = 0) to the target. The pctbachdeg25_over, pctemployed16_over and medincome are highly significant negatively correlated to the target (r < -0.44). pctprivatecoverage and pctprivatecoveragealone have a less but also significant negative correlation to the price (r < -0.4, p ~ 0), which makes sense as they are very similar measures. To further illustrate the correlations, a correlation matrix is plotted as well.
+
+For the qualitative variables, we only have binnedinc, which has a low R2 value not explaining too much of the variable.
 ```{r}
 library(FactoMineR)
 
-res.con <- condes(train[,1:12], 3)
-
+res.con <- condes(train[,c(1:12,14:31)], 3)
+res.con$quanti
+res.con$quali
 ```
 
