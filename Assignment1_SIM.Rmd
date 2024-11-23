@@ -3,15 +3,15 @@ title: "Assignament 1 - SIM"
 author: "Nashly"
 date: "2024-11-19"
 output:
-  pdf_document:
+  word_document:
     toc: true
-    #number_sections: true
   html_document:
     toc: true
     toc_depth: 4
     #number_sections: true
-  word_document:
+  pdf_document:
     toc: true
+    #number_sections: true
 ---
 
 # Profiling
@@ -77,8 +77,8 @@ sum(is.na(df$incidencerate))
 
 boxplot(df$incidencerate)
 
-bp<-boxplot(df$incidencerate, id = list(n=Inf))
-length(bp$out)
+Boxplot(df$incidencerate)
+length(Boxplot(df$incidencerate, id = list(n=Inf), plot=FALSE))
 
 sevout_incidencerate = (quantile(df$incidencerate,0.25)+(3*((quantile(df$incidencerate,0.75) - quantile(df$incidencerate, 0.25)))))
 length(which(df$incidencerate > sevout_incidencerate))
@@ -111,8 +111,8 @@ sum(is.na(df$medincome))
 
 boxplot(df$medincome)
 
-bp<-boxplot(df$medincome, id = list(n=Inf))
-length(bp$out)
+Boxplot(df$medincome)
+length(Boxplot(df$medincome, id = list(n=Inf), plot=FALSE))
 
 sevout_medincome = (quantile(df$medincome,0.25)+(3*((quantile(df$medincome,0.75) - quantile(df$medincome, 0.25)))))
 length(which(df$medincome > sevout_medincome))
@@ -148,9 +148,10 @@ hist(df$percentmarried, breaks = 30, freq = F)
 curve(dnorm(x, mean(df$percentmarried), sd(df$percentmarried)), add = T , col = "red")
 shapiro.test(df$percentmarried)
 sum(is.na(df$percentmarried))
-boxplot(df$percentmarried)
-bp<-boxplot(df$percentmarried, id = list(n=Inf))
-length(bp$out)
+
+Boxplot(df$percentmarried)
+length(Boxplot(df$percentmarried, id = list(n=Inf), plot=FALSE))
+
 sevout_percentmarried = (quantile(df$percentmarried,0.25)+(3*((quantile(df$percentmarried,0.75) - quantile(df$medianagefemale, 0.25)))))
 length(which(df$percentmarried > sevout_percentmarried))
 sevout_percentmarried
@@ -182,8 +183,8 @@ sum(is.na(df$pctpubliccoveragealone))
 
 boxplot(df$pctpubliccoveragealone)
 
-bp<-boxplot(df$pctpubliccoveragealone, id = list(n=Inf))
-length(bp$out)
+Boxplot(df$pctpubliccoveragealone)
+length(Boxplot(df$pctpubliccoveragealone, id = list(n=Inf), plot=FALSE))
 
 sevout_pctpubliccoveragealone = (quantile(df$pctpubliccoveragealone,0.25)+(3*((quantile(df$pctpubliccoveragealone,0.75) - quantile(df$pctpubliccoveragealone, 0.25)))))
 length(which(df$pctpubliccoveragealone > sevout_pctpubliccoveragealone))
@@ -214,8 +215,8 @@ sum(is.na(df$pctblack))
 
 boxplot(df$pctblack)
 
-bp<-boxplot(df$pctblack, id = list(n=Inf))
-length(bp$out)
+Boxplot(df$pctblack)
+length(Boxplot(df$pctblack, id = list(n=Inf), plot=FALSE))
 
 sevout_pctblack= (quantile(df$pctblack,0.25)+(3*((quantile(df$pctblack,0.75) - quantile(df$pctblack, 0.25)))))
 length(which(df$pctblack > sevout_pctblack))
